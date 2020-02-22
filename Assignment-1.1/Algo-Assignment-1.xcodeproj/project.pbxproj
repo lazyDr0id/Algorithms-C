@@ -45,7 +45,7 @@
 		F026FA622401565E005C9C0A = {
 			isa = PBXGroup;
 			children = (
-				F026FA6D2401565E005C9C0A /* Algo-Assignment-1 */,
+				F026FA6D2401565E005C9C0A /* Assignment-1.1 */,
 				F026FA6C2401565E005C9C0A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,7 +58,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		F026FA6D2401565E005C9C0A /* Algo-Assignment-1 */ = {
+		F026FA6D2401565E005C9C0A /* Assignment-1.1 */ = {
 			isa = PBXGroup;
 			children = (
 				F026FA7624015689005C9C0A /* input.txt */,
@@ -66,7 +66,7 @@
 				F026FA772401568A005C9C0A /* queue.c */,
 				F026FA7524015689005C9C0A /* queue.h */,
 			);
-			path = "Algo-Assignment-1";
+			path = "Assignment-1.1";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
