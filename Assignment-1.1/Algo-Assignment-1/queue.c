@@ -30,9 +30,6 @@ void enqueue(Queue *q, void *element) {
     }
     
     (q->size)++;
-    
-    printf("en - ");
-    printQueue(q);
 }
 
 void *dequeue(Queue *q) {
@@ -57,9 +54,6 @@ void *dequeue(Queue *q) {
 
     free(oldHead);
     (q->size)--;
-   
-    printf("de - "); 
-    printQueue(q);
     
     return element;
 }

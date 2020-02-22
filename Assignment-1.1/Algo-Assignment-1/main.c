@@ -92,6 +92,7 @@ void breadFirstTraversal(Queue *q, Vertex **vertices, char *isVisited, int numbe
             enqueue(q, p);
             isVisited[*p] = 1;
             
+            printf("\n"); // Print the traversal of the new component on a newline
             breadFirstTraversal(q, vertices, isVisited, numberOfVertices);
             return;
         } else {
