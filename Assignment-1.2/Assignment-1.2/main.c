@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "queue.h"
 
 // This is used to store the information of the graph in the adjacency list
@@ -20,9 +21,9 @@ struct VertexInfo {
 typedef struct VertexInfo VertexInfo;
 
 void printGraphAdjacencyList(Vertex **vertices, int numberOfVertices);
-void breadFirstTraversal(Queue *q, Vertex **vertices,char *isVisited, VertexInfo **vertexInfos, int numberOfVertices);
+void breadFirstTraversal(Queue *q, Vertex **vertices, bool *isVisited, VertexInfo **vertexInfos, int numberOfVertices);
 
-_Bool isCycleFound = 0;
+bool isCycleFound = false;
 int cycleLeftNodeIndex;
 int cycleRightNodeIndex;
 
@@ -47,12 +48,23 @@ int main(int argc, char **argv)
     // Read the number of vertices and the starting vertex of the BF traversal
     int numberOfVertices; int startingVertex;
     fscanf(inputFile, "%d %d\n", &numberOfVertices, &startingVertex);
+    
+    // Check if given input is valid or not
+    if (numberOfVertices < 1) {
+        printf("The graph needs to have atleast 1 vertex. Please enter a valid input and try again.\n");
+        return 0;
+    }
+    if (startingVertex > numberOfVertices) {
+        printf("Vertex %d is given as the starting vertex in the input, but the graph has only %d vertices in total. Please enter a valid input and try again.\n", startingVertex, numberOfVertices);
+        return 0;
+    }
+    
     startingVertex--; // The index starts from 0. The inputfile has it from 1. So adjusting by 1.
     
     // Form a adjacency list of the graph
     // (All the index are starting from 0, adjusted by 1 from inputfile)
     // (This is just done in code. The output will again be adjusted to match the indexing in inputfile.)
-    Vertex **vertices = malloc(sizeof(Vertex *) * numberOfVertices);
+    Vertex **vertices = calloc(sizeof(Vertex *) , numberOfVertices);
     char *buffer = NULL; size_t bufferSize = 0;
     int n, bytesread; Vertex **v;
     for (int i = 0; i < numberOfVertices; i++) {
@@ -60,6 +72,16 @@ int main(int argc, char **argv)
         char *temp = buffer;
         v = vertices + i;
         while (sscanf(buffer, "%d%n", &n, &bytesread) > 0) {
+            // Check if the vertex is within the given range
+            if (n > numberOfVertices || n < 1) {
+                printf("Vertex %d is given as the neighbour of vertex %d, but the graph has only %d vertices in total. Please enter a valid input and try again.\n", n, i + 1, numberOfVertices);
+                return 0;
+            }
+            if (i == n - 1) {
+                // Ignore if the vertex is connected to itself
+                buffer += bytesread;
+                continue;
+            }
             Vertex *new = malloc(sizeof(Vertex));
             new->value = n-1;
             new->next = NULL;
@@ -80,8 +102,8 @@ int main(int argc, char **argv)
     p->value = startingVertex;
     enqueue(q, p);
     
-    char *isVisited = calloc(sizeof(char) , numberOfVertices);
-    isVisited[p->value] = 1;
+    bool *isVisited = calloc(sizeof(bool) , numberOfVertices);
+    isVisited[p->value] = true;
     
     VertexInfo **vertexInfos = malloc(sizeof(VertexInfo *) * numberOfVertices);
     vertexInfos[p->value] = p;
@@ -92,7 +114,7 @@ int main(int argc, char **argv)
     // Print the cycle
     if (isCycleFound) {
         VertexInfo *head = NULL;
-        printf("Yes\n");
+        printf("Yes (");
         while (cycleLeftNodeIndex != cycleRightNodeIndex) {
             printf("%d ", cycleLeftNodeIndex + 1);
             cycleLeftNodeIndex = vertexInfos[cycleLeftNodeIndex]->parent->value;
@@ -112,19 +134,26 @@ int main(int argc, char **argv)
         printf("%d ", cycleLeftNodeIndex + 1);
         
         while(head != NULL) {
-            printf("%d ", head->value + 1);
+            if (head->leftChild == NULL) { // i.e this is the last vertex in the cycle
+                printf("%d)", head->value + 1);
+            } else {
+                printf("%d ", head->value + 1);
+            }
+            
             head = head->leftChild;
         }
     } else {
         printf("No\n");
     }
     
+    printf("\n");
+    
     return 0;
 }
 
 // This does a BFS traversal, but does not print the nodes while traversing,
 // just checks if the graph has any cycle
-void breadFirstTraversal(Queue *q, Vertex **vertices, char *isVisited, VertexInfo **vertexInfos, int numberOfVertices) {
+void breadFirstTraversal(Queue *q, Vertex **vertices, bool *isVisited, VertexInfo **vertexInfos, int numberOfVertices) {
     if (isEmpty(q)) {
         // If cycle is not found.
         // Check if the all the vertices are visited or not.
@@ -150,7 +179,7 @@ void breadFirstTraversal(Queue *q, Vertex **vertices, char *isVisited, VertexInf
                 VertexInfo *p = malloc(sizeof(VertexInfo));
                 p->value = unvisitedVertex;
                 enqueue(q, p);
-                isVisited[p->value] = 1;
+                isVisited[p->value] = true;
                 vertexInfos[p->value] = p;
                 breadFirstTraversal(q, vertices, isVisited, vertexInfos, numberOfVertices);
                 return;
@@ -184,7 +213,7 @@ void breadFirstTraversal(Queue *q, Vertex **vertices, char *isVisited, VertexInf
             leftChild = &c;
             
             enqueue(q, c);
-            isVisited[value] = 1;
+            isVisited[value] = true;
             
             // Save the vertex info for later usage of printing the cycle
             vertexInfos[value] = c;
@@ -194,7 +223,7 @@ void breadFirstTraversal(Queue *q, Vertex **vertices, char *isVisited, VertexInf
                 // IF not, that means there is a cycle
                 // Save the relevant info
                 if (!isCycleFound) {
-                    isCycleFound = 1;
+                    isCycleFound = true;
                     cycleLeftNodeIndex = value;
                     cycleRightNodeIndex = v->value;
                 }

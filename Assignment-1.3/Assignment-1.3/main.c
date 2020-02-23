@@ -23,7 +23,7 @@ typedef struct VertexInfo VertexInfo;
 void printGraphAdjacencyList(Vertex **vertices, int numberOfVertices);
 void breadFirstTraversal(Queue *q, Vertex **vertices, bool *isVisited, VertexInfo **vertexInfos, int numberOfVertices, bool *independentSetData);
 
-bool isCycleFound = false;
+// Global vars
 bool isGraphBipartite = true;
 int cycleLeftNodeIndex;
 int cycleRightNodeIndex;
@@ -202,7 +202,7 @@ int main(int argc, char **argv)
         
     }
     
-    
+    printf("\n");
     
     return 0;
 }
@@ -287,6 +287,7 @@ void breadFirstTraversal(Queue *q, Vertex **vertices, bool *isVisited, VertexInf
     breadFirstTraversal(q, vertices, isVisited, vertexInfos, numberOfVertices, independentSetData);
 }
 
+// Debug helper function
 void printGraphAdjacencyList(Vertex **vertices, int numberOfVertices) {
     for (int i = 0; i < numberOfVertices; i++) {
         Vertex *v = vertices[i];

@@ -47,7 +47,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "/Users/prajyot/Developer/Algorithms-ISI/Assignment-1.1/Algo-Assignment-1"
+      customWorkingDirectory = "/Users/prajyot/Developer/Algorithms-ISI/Assignment-1.1/Assignment-1.1"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"

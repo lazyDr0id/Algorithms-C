@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "queue.h"
 
 struct Vertex {
@@ -9,7 +10,7 @@ struct Vertex {
 typedef struct Vertex Vertex;
 
 void printGraphAdjacencyList(Vertex **vertices, int numberOfVertices);
-void breadFirstTraversal(Queue *q, Vertex **vertices,char *isVisited, int numberOfVertices);
+void breadFirstTraversal(Queue *q, Vertex **vertices,bool *isVisited, int numberOfVertices);
 
 int main(int argc, char **argv)
 {
@@ -32,12 +33,23 @@ int main(int argc, char **argv)
     // Read the number of vertices and the starting vertex of the BF traversal
     int numberOfVertices; int startingVertex;
     fscanf(inputFile, "%d %d\n", &numberOfVertices, &startingVertex);
+    
+    // Check if given input is valid or not
+    if (numberOfVertices < 1) {
+        printf("The graph needs to have atleast 1 vertex. Please enter a valid input and try again.\n");
+        return 0;
+    }
+    if (startingVertex > numberOfVertices) {
+        printf("Vertex %d is given as the starting vertex in the input, but the graph has only %d vertices in total. Please enter a valid input and try again.\n", startingVertex, numberOfVertices);
+        return 0;
+    }
+    
     startingVertex--; // The index starts from 0. The inputfile has it from 1. So adjusting by 1.
     
     // Form a adjacency list of the graph
     // (All the index are starting from 0, adjusted by 1 from inputfile)
     // (This is just done in code. The output will again be adjusted to match the indexing in inputfile.)
-    Vertex **vertices = malloc(sizeof(Vertex *) * numberOfVertices);
+    Vertex **vertices = calloc(sizeof(Vertex *) , numberOfVertices);
     char *buffer = NULL; size_t bufferSize = 0;
     int n, bytesread; Vertex **v;
     for (int i = 0; i < numberOfVertices; i++) {
@@ -45,6 +57,16 @@ int main(int argc, char **argv)
         char *temp = buffer;
         v = vertices + i;
         while (sscanf(buffer, "%d%n", &n, &bytesread) > 0) {
+            // Check if the vertex is within the given range
+            if (n > numberOfVertices || n < 1) {
+                printf("Vertex %d is given as the neighbour of vertex %d, but the graph has only %d vertices in total. Please enter a valid input and try again.\n", n, i + 1, numberOfVertices);
+                return 0;
+            }
+            if (i == n - 1) {
+                // Ignore if the vertex is connected to itself
+                buffer += bytesread;
+                continue;
+            }
             Vertex *new = malloc(sizeof(Vertex));
             new->value = n-1;
             new->next = NULL;
@@ -65,14 +87,16 @@ int main(int argc, char **argv)
     *p = startingVertex;
     enqueue(q, p);
     
-    char *isVisited = calloc(sizeof(char) , numberOfVertices);
-    isVisited[*p] = 1;
+    bool *isVisited = calloc(sizeof(bool) , numberOfVertices);
+    isVisited[*p] = true;
     breadFirstTraversal(q, vertices, isVisited, numberOfVertices);
+    
+    printf("\n");
     
     return 0;
 }
 
-void breadFirstTraversal(Queue *q, Vertex **vertices, char *isVisited, int numberOfVertices) {
+void breadFirstTraversal(Queue *q, Vertex **vertices, bool *isVisited, int numberOfVertices) {
     if (isEmpty(q)) {
         // Check if the all the vertices are visited or not.
         // If the graph is not connected, the queue might become empty prematurely
@@ -90,7 +114,7 @@ void breadFirstTraversal(Queue *q, Vertex **vertices, char *isVisited, int numbe
             int *p = malloc(sizeof(int));
             *p = unvisitedVertex;
             enqueue(q, p);
-            isVisited[*p] = 1;
+            isVisited[*p] = true;
             
             printf("\n"); // Print the traversal of the new component on a newline
             breadFirstTraversal(q, vertices, isVisited, numberOfVertices);
@@ -114,7 +138,7 @@ void breadFirstTraversal(Queue *q, Vertex **vertices, char *isVisited, int numbe
             int *p = malloc(sizeof(int));
             *p = value;
             enqueue(q, p);
-            isVisited[value] = 1;
+            isVisited[value] = true;
         }
         ver = ver->next;
     }
