@@ -1,2 +1,2 @@
-# Algorithms-ISI
-These are all the assignments questions given for the algorithms course at ISI
+# Design and Analysis of Algorithms
+Assignments and their solutions in C
